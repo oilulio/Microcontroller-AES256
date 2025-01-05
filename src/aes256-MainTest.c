@@ -1,0 +1,42 @@
+#include <stdint.h>
+#include <stdio.h>
+
+#include "aes256.h"
+
+void ExpandKey(uint8_t Nk,uint8_t * key); // Not in aes256.h as not a usual external call
+
+// Tests the aes256.c routines against Ref A : https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf 
+
+void main() {
+
+// Test key expansion against A.3 of ref A. 
+
+  uint8_t expandKey[]={0x60,0x3d,0xeb,0x10,0x15,0xca,0x71,0xbe,0x2b,0x73,0xae,0xf0,0x85,0x7d,0x77,0x81,
+                       0x1f,0x35,0x2c,0x07,0x3b,0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4};
+                       
+  uint8_t expandKeyTarget[]={0xca,0xfa,0xaa,0xe3,0xe4,0xd5,0x9b,0x34,0x9a,0xdf,0x6a,0xce,0xbd,0x10,0x19,0x0d,
+                             0xfe,0x48,0x90,0xd1,0xe6,0x18,0x8d,0x0b,0x04,0x6d,0xf3,0x44,0x70,0x6c,0x63,0x1e};
+  // Target is offset by 4 words (16 bytes) as 60%8=4; hence "+16" below in test
+
+  for (uint8_t i=8;i<60;i++) ExpandKey(i,expandKey);
+
+  uint8_t pass=1;
+  for (uint8_t i=0;i<32;i++) pass&=(expandKey[(i+16)%32]==expandKeyTarget[i]);
+    
+  printf("Key expansion test from FIPS197 : %s\n",pass?"PASS":"**FAIL**");
+
+  // Test encryption against C.3 of ref A. 
+
+  uint8_t key[32];  // 32 * 8 = 2^5 * 2^3 = 2^8 = 256 (for AES 256)
+  for (int i=0;i<32;i++) key[i]=i; // test vector key
+
+  uint8_t state[16];
+  for (uint8_t i=0;i<16;i++) state[i]=i*0x11; // Test input
+
+  AES256_Encrypt(key,state);
+
+  uint8_t target[16]={0x8e,0xa2,0xb7,0xca,0x51,0x67,0x45,0xbf,0xea,0xfc,0x49,0x90,0x4b,0x49,0x60,0x89};
+  pass=1;
+  for (int j=0;j<16;j++) pass&=(state[j]==target[j]);
+  printf("Standard Encryption test from FIPS197 : %s\n",pass?"PASS":"**FAIL**");
+}
