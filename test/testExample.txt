@@ -1,0 +1,10 @@
+gcc -o aes256-Test ../src/aes256.c ../src/aes256-MainTest.c
+./aes256-Test
+Key expansion test from FIPS197 : PASS
+Standard Encryption test from FIPS197 : PASS
+
+gcc -o aes256-ComparisonTest ../src/aes256.c ../src/aes256-ComparisonTest.c
+./aes256-ComparisonTest
+Encryption test 0 : PASS
+Encryption test 1 : PASS
+Successes = 2 out of 2
