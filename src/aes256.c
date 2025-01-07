@@ -5,6 +5,23 @@
 // and for Mix Columns : Ref B Gamal, Eslam & Shaaban, Eman & Hashem, Mohamed.
 // (2009). Lightweight mix columns implementation for AES.  
 
+/*
+    Copyright (C) 2025 S Combes
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // Aimed at 8 bit microcontroller (32 bit instructions would make it simpler)
 // Should be safe for any endianism as is fully byte orientated.
 
