@@ -5,6 +5,23 @@
 // and for Mix Columns : Ref B Gamal, Eslam & Shaaban, Eman & Hashem, Mohamed.
 // (2009). Lightweight mix columns implementation for AES.  
 
+/*
+    Copyright (C) 2025 S Combes
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // Aimed at 8 bit microcontroller (32 bit instructions would make it simpler)
 // Should be safe for any endianism as is fully byte orientated.
 
@@ -56,13 +73,29 @@ void XorRCon(uint8_t Nk,uint8_t * start) {
 void ExpandKey(uint8_t Nk,uint8_t * key) { // Ref A Fig 11 & A3
   // Must be called with consecutive Nk
   // Expands key in place, so key must be used by a round before next call
+  
+  // General principle - consider key to be 8 words of 32 bits, numbered 0,1...7
+  // and in a cyclical arrangement (i.e. word 0 is after word 7)
+  
+  // Note that consecutive rounds of encryption used 128 bits of the key, flipping
+  // from first half to second half and vice versa, at next round.  There are four
+  // Nk steps between each round.
+  
+  // At every Nk, the relevant word of the key is xor'd with something based on the
+  // previous word.  For most cases this is simply the previous word.
+  // When word 0 of the key is updated, the xor is based on the preceding word 
+  // after rotation; byte substitution; and xor with a round constant.
+  // When word 3 is updated, the xor is based on the preceding word after byte
+  // substitution.
+  
+  // Note that the 'round constant' is in fact only used on alternate rounds.
     
   if (Nk<8) return; // Leave key alone
 
   uint8_t temp[4]; // Last word of previous key, which is then mutated
 
   // Pointer to the start of the word from which we derive temp
-  uint8_t * keySource=key+((28+(Nk<<2))&0x1F); 
+  uint8_t * keySource=key+(((32-4)+(Nk<<2))&0x1F); // "-4 mod 32" = previous word
   // Pointer to the start of the word that we are about to change 
   uint8_t * keySink  =key+((Nk<<2)&0x1F); 
 
@@ -71,10 +104,10 @@ void ExpandKey(uint8_t Nk,uint8_t * key) { // Ref A Fig 11 & A3
   temp[2]=keySource[2];
   temp[3]=keySource[3];
 
-  if (Nk&0x07) {
-    if (!(Nk&0x03)) SubWord(temp); // Special step
+  if (Nk&0x07) { 
+    if (!(Nk&0x03)) SubWord(temp); // Special step when Nk=4, 12, ...  (i.e. keySink is word 3 of key)  
     
-  } else { // Special steps
+  } else { // Special steps when Nk=8,16,...56 (i.e. keySink is word 0 of key)  
     RotWord(temp);
     SubWord(temp);
     XorRCon(Nk,temp);
