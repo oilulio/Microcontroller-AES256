@@ -2,8 +2,7 @@
 #include "aes256.h"
 
 // Minimal AES256 implementation from Ref A : https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf 
-// and for Mix Columns : Ref B Gamal, Eslam & Shaaban, Eman & Hashem, Mohamed.
-// (2009). Lightweight mix columns implementation for AES.  
+// and for Mix Columns : Ref B AES Proposal: Rijndael Joan Daemen, Vincent Rijmen  Document version2, Date:03/09/99  
 
 /*
     Copyright (C) 2025 S Combes
@@ -151,7 +150,7 @@ uint8_t xtime(uint8_t input) { // Ref A sect 4.2.1
   return (input&0x80)?(input<<1)^0x1B:(input<<1); 
 }
 // -------------------------------------------------------------------------------
-void MixColumns(uint8_t * state) { // From Ref B Equation (4)
+void MixColumns(uint8_t * state) { // From Ref B Sect 5.1
   for (uint8_t colBase=0;colBase<16;colBase+=4) {
     uint8_t * column=state+colBase;
     uint8_t temp=column[0];
@@ -198,3 +197,7 @@ void AES256_Encrypt(uint8_t * key,uint8_t * state) {
 }
 // ** No AES256_Decrypt provided **.  Would bloat code. Intent is that encrypt is used 
 // with CTR mode to create a stream cipher that can encrypt/decrypt 
+
+// From Ref B 5.3.4 : "In many applications of a block cipher, 
+// the inverse cipher operation is not used. This is the case for the calculation of 
+// MACs, but also when the cipher is used in CFB-mode or OFB-mode"
