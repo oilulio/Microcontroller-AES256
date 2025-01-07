@@ -15,7 +15,7 @@ Uses xor whenever possible.
 
 ## TESTING.  
 
-Matches the test vectors in Ref A.
+Matches the test vectors in Ref A and relevant standard test vectors from NIST from https://web.archive.org/web/20091023001419/http://csrc.nist.gov/groups/STM/cavp/documents/aes/KAT_AES.zip
 
 Also compared with 1,000,000 ECB encryptions from python using random 256 bit key and random 128 bit 'plaintext'.  100% matches with generated ciphertext.
 
